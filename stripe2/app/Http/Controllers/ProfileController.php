@@ -17,7 +17,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $request->user()
         ]);
     }
 
@@ -56,5 +56,13 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function index()
+    {
+        $user = auth()->user();
+        return view("home", [
+            "intent" => $user->createSetupIntent(),
+        ]);
     }
 }
