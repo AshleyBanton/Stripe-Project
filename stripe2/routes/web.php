@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PaymentController;
+
+Route::get('/payment-form', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
+
 
 Route::get('/', function () {
     return view('welcome');

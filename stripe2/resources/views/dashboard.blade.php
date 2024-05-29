@@ -52,7 +52,6 @@
     <div class="form-group text-center">
         <button  id="card-button" data-secret="{{ $intent->client_secret }}" class="btn btn-lg btn-success btn-block">SUBMIT</button>
     </div>
-</form>
 
                 </div>
             </div>
@@ -63,62 +62,40 @@
 @section('scripts')
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    var stripe = Stripe('{{ env('STRIPE_KEY') }}');
-    var elements = stripe.elements();
-    var style = {
-        base: {
-            color: '#32325d',
-            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            fontSmoothing: 'antialiased',
-            fontSize: '16px',
-            '::placeholder': {
-                color: '#aab7c4'
-            }
-        },
-        invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a'
-        }
-    };
-    var card = elements.create('card', {hidePostalCode: true,
-        style: style});
-    card.mount('#card-element');
-    card.addEventListener('change', function(event) {
-        var displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
-        }
-    });
-    const cardHolderName = document.getElementById('card-holder-name');
-    const cardButton = document.getElementById('card-button');
-    const clientSecret = cardButton.dataset.secret;
-    cardButton.addEventListener('click', async (e) => {
-        console.log("attempting");
-        const { setupIntent, error } = await stripe.confirmCardSetup(
-            clientSecret, {
-                payment_method: {
-                    card: card,
-                    billing_details: { name: cardHolderName.value }
+    document.addEventListener('DOMContentLoaded', function () {
+        var stripe = Stripe('{{ config('services.stripe.key') }}');
+        var elements = stripe.elements();
+        var cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            stripe.confirmCardSetup(
+                '{{ $intent->client_secret }}',
+                {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: 'Customer Name',
+                        },
+                    },
                 }
-            }
-            );
-        if (error) {
-            var errorElement = document.getElementById('card-errors');
-            errorElement.textContent = error.message;
-        } else {
-            paymentMethodHandler(setupIntent.payment_method);
-        }
+            ).then(function (result) {
+                if (result.error) {
+                    // Display error.message in your UI.
+                } else {
+                    // The setup has succeeded. Send the payment method ID to your server.
+                }
+            });
+        });
     });
-    function paymentMethodHandler(payment_method) {
-        var form = document.getElementById('subscribe-form');
-        var hiddenInput = document.createElement('input');
-        hiddenInput.setAttribute('type', 'hidden');
-        hiddenInput.setAttribute('name', 'payment_method');
-        hiddenInput.setAttribute('value', payment_method);
-        form.appendChild(hiddenInput);
-        form.submit();
-    }
 </script>
+
+<form id="payment-form">
+    <div id="card-element"></div>
+    <button type="submit">Submit Payment</button>
+</form>
+
 @endsection

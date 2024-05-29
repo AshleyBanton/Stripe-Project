@@ -61,8 +61,8 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
-        return view("home", [
-            "intent" => $user->createSetupIntent(),
+        return view('home', [
+            'intent' => $user->createSetupIntent(),
         ]);
     }
 }
