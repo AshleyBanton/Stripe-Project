@@ -27,7 +27,7 @@ $response = $stripe->checkout->sessions->create([
       'adjustable_quantity' => [
         'enabled' => true,
         'minimum' => 1,
-        'maximum' => 1000,
+        'maximum' => 99,
       ],
       'quantity' => 1,
     ],
