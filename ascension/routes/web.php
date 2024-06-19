@@ -22,9 +22,6 @@ Route::get('pricing', function () {
     return view('pricing');
 });
 
-Route::get('subscription', function () {
-    return view('subscription');
-});
 
 
 
